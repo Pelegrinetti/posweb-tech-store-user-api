@@ -6,9 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type ServerConfig struct {
+	Port int `mapstructure:"PORT"`
+}
 type server struct {
-	port int
-	app  *fiber.App
+	config ServerConfig
+	app    *fiber.App
 }
 
 func (s *server) setupRoutes() {
@@ -20,14 +23,14 @@ func (s *server) setupRoutes() {
 func (s *server) Run() {
 	s.setupRoutes()
 
-	s.app.Listen(fmt.Sprintf(":%d", s.port))
+	s.app.Listen(fmt.Sprintf(":%d", s.config.Port))
 }
 
-func New(port int) *server {
+func New(serverConfig ServerConfig) *server {
 	app := fiber.New()
 
 	return &server{
-		port,
-		app,
+		config: serverConfig,
+		app:    app,
 	}
 }
