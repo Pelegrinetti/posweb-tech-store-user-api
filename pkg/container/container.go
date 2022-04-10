@@ -4,14 +4,14 @@ import (
 	"github.com/Pelegrinetti/posweb-user-api/pkg/database"
 )
 
-type container struct {
-	database *database.Database
+type Container struct {
+	Database *database.Database
 }
 
-func (c *container) AddDatabase(db *database.Database) {
-	c.database = db
+func (c *Container) AddDatabase(db *database.Database) {
+	c.Database = db
 }
 
-func New() *container {
-	return &container{}
+func New() *Container {
+	return &Container{}
 }
