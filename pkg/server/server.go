@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 
+	"github.com/Pelegrinetti/posweb-user-api/pkg/container"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,8 +11,9 @@ type ServerConfig struct {
 	Port int `mapstructure:"PORT"`
 }
 type server struct {
-	config ServerConfig
-	app    *fiber.App
+	config    ServerConfig
+	app       *fiber.App
+	container *container.Container
 }
 
 func (s *server) setupRoutes() {
@@ -29,11 +31,12 @@ func (s *server) Run() {
 	s.app.Listen(fmt.Sprintf(":%d", s.config.Port))
 }
 
-func New(serverConfig ServerConfig) *server {
+func New(ctn *container.Container, serverConfig ServerConfig) *server {
 	app := fiber.New()
 
 	return &server{
-		config: serverConfig,
-		app:    app,
+		config:    serverConfig,
+		app:       app,
+		container: ctn,
 	}
 }
