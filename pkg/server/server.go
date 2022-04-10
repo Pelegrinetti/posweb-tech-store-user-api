@@ -15,8 +15,11 @@ type server struct {
 }
 
 func (s *server) setupRoutes() {
-	s.app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Olá mundo")
+	s.app.Get("/liveness", func(c *fiber.Ctx) error {
+		return c.SendString("OK")
+	})
+	s.app.Get("/readiness", func(c *fiber.Ctx) error {
+		return c.SendString("OK")
 	})
 }
 
