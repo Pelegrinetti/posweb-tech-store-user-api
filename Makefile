@@ -10,7 +10,7 @@ build-docker-image:
 	@echo "Built!"
 
 check-if-docker-image-exists:
-ifeq ($(shell docker images -q $(CONTAINER_NAME) 2> /dev/null | wc -l), 0)
+ifeq ($(shell docker images -q $(CONTAINER_NAME):$(TARGET) 2> /dev/null | wc -l), 0)
 	@make build-docker-image
 else
 	@echo "Docker image already exists!"
@@ -26,10 +26,20 @@ ifeq ($(shell ls -la | grep .env 2> /dev/null | wc -l), 1)
 	@make copy-dotenv-sample
 endif
 
+install-vendor: 
+	@echo "Installing modules..."
+	@go mod vendor
+	@echo "Done! All modules installed."
+
+check-vendor:
+ifeq ($(shell ls -la | grep vendor 2> /dev/null | wc -l), 0)
+	@make install-vendor
+endif
+
 build:
 	@go build -o bin/server cmd/main.go
 
-start: check-dotenv check-if-docker-image-exists
+start: check-vendor check-dotenv check-if-docker-image-exists
 	@echo "Running $(API_NAME) at $(PORT) port."
 	@docker run --rm \
 		--name $(API_NAME) \
