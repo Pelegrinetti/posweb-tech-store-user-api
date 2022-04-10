@@ -12,7 +12,7 @@ type server struct {
 }
 
 func (s *server) setupRoutes() {
-	s.app.Get("/*", func(c *fiber.Ctx) error {
+	s.app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Olá mundo")
 	})
 }
