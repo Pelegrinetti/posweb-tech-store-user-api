@@ -16,10 +16,20 @@ else
 	@echo "Docker image already exists!"
 endif
 
+copy-dotenv-sample:
+	@echo "Creating .env file..."
+	@cp .env.sample .env
+	@echo "Done! .Env created!"
+
+check-dotenv:
+ifeq ($(shell ls -la | grep .env 2> /dev/null | wc -l), 1)
+	@make copy-dotenv-sample
+endif
+
 build:
 	@go build -o bin/server cmd/main.go
 
-start: check-if-docker-image-exists
+start: check-dotenv check-if-docker-image-exists
 	@echo "Running $(API_NAME) at $(PORT) port."
 	@docker run --rm \
 		--name $(API_NAME) \
