@@ -39,12 +39,9 @@ endif
 build:
 	@go build -o bin/server cmd/main.go
 
-start: check-vendor check-dotenv check-if-docker-image-exists
+start: check-dotenv check-if-docker-image-exists
 	@echo "Running $(API_NAME) at $(PORT) port."
-	@docker run --rm \
-		--name $(API_NAME) \
-		-p $(PORT):$(PORT) \
-		--env-file=.env \
-		-v $(PWD):/usr/app \
-		$(CONTAINER_NAME):$(TARGET) \
-		$(API_NAME)
+	@docker-compose --env-file .env up
+
+stop:
+	@docker-compose down
