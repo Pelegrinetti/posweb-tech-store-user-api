@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -9,7 +10,8 @@ import (
 )
 
 type DatabaseConfig struct {
-	Uri string `mapstructure:"MONGODB_URI"`
+	Uri    string `mapstructure:"MONGODB_URI"`
+	DBName string `mapstructure:"MONGODB_NAME"`
 }
 
 type Database struct {
@@ -18,13 +20,20 @@ type Database struct {
 }
 
 func (db *Database) Ping() (bool, error) {
-	err := db.client.Ping(context.TODO(), readpref.Primary())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	err := db.client.Ping(ctx, readpref.Primary())
 
 	if err == nil {
 		return true, nil
 	}
 
 	return false, err
+}
+
+func (db *Database) GetCollection(name string) *mongo.Collection {
+	return db.client.Database(db.config.DBName).Collection(name)
 }
 
 func New(databaseConfig DatabaseConfig) (*Database, error) {
