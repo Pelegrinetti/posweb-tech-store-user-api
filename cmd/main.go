@@ -11,6 +11,8 @@ import (
 func checkError(err error) {
 	if err != nil {
 		logrus.Fatal(err)
+
+		panic(err)
 	}
 }
 
@@ -19,13 +21,13 @@ func main() {
 
 	db, dbError := database.New(cfg.DatabaseConfig)
 
+	checkError(dbError)
+
 	ctn := container.New()
 
 	ctn.AddDatabase(db)
 
 	srv := server.New(ctn, cfg.ServerConfig)
-
-	checkError(dbError)
 
 	srv.Run()
 }
