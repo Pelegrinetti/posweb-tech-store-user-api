@@ -4,15 +4,10 @@ import (
 	"fmt"
 
 	"github.com/Pelegrinetti/posweb-user-api/pkg/container"
+	"github.com/Pelegrinetti/posweb-user-api/pkg/controllers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
-
-func checkErrorAndLog(err error) {
-	if err != nil {
-		logrus.Error(err)
-	}
-}
 
 type ServerConfig struct {
 	Port int `mapstructure:"PORT"`
@@ -28,16 +23,22 @@ func (s *server) setupRoutes() {
 		return c.SendString("OK")
 	})
 	s.app.Get("/readiness", func(c *fiber.Ctx) error {
-		db, dbError := s.container.Database.Ping()
+		ping, pingError := s.container.Database.Ping()
 
-		checkErrorAndLog(dbError)
+		if pingError != nil {
+			logrus.Error(pingError)
 
-		if db {
+			return c.Status(503).SendString("NOK")
+		}
+
+		if ping {
 			return c.SendString("OK")
 		}
 
 		return c.Status(503).SendString("NOK")
 	})
+
+	s.app.Post("/users", controllers.UserCreate(s.container.Database))
 }
 
 func (s *server) Run() {
