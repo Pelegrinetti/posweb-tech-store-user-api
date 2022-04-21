@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  user-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: user-api
+    env_file:
+      - .env
+    ports:
+      - 3001:3001
+    volumes:
+      - .:/usr/app
+  mongodb:
+    image: mongo
+    environment:
+      # Only for development purporses 
+      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USERNAME}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
+    ports:
+      - 27017:27017
