@@ -14,6 +14,7 @@ type Config struct {
 func New() Config {
 	viper.SetDefault("PORT", 3001)
 	viper.SetDefault("MONGODB_URI", "mongodb://localhost:27017/user-api")
+	viper.SetDefault("MONGODB_NAME", "user-api")
 	viper.AutomaticEnv()
 
 	config := Config{}
