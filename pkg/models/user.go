@@ -61,8 +61,6 @@ func (u *User) Insert() (bool, error) {
 	validationError := u.Validate()
 
 	if validationError != nil {
-		logrus.Error(validationError)
-
 		return false, validationError
 	}
 

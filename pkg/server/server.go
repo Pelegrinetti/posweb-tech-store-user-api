@@ -26,7 +26,7 @@ func (s *server) setupRoutes() {
 		ping, pingError := s.container.Database.Ping()
 
 		if pingError != nil {
-			logrus.Error(pingError)
+			logrus.Error("Can't connect with database: ", pingError)
 
 			return c.Status(503).SendString("NOK")
 		}
