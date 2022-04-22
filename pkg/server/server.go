@@ -38,7 +38,7 @@ func (s *server) setupRoutes() {
 		return c.Status(503).SendString("NOK")
 	})
 
-	s.app.Post("/users", controllers.UserCreate(s.container.Database))
+	s.app.Post("/users", controllers.CreateUser(s.container.Database))
 }
 
 func (s *server) Run() {

@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func UserCreate(db *database.Database) fiber.Handler {
+func CreateUser(db *database.Database) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		usersCollection := db.GetCollection("users")
 
