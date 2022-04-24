@@ -14,7 +14,7 @@ func CreateUser(db *database.Database) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		usersCollection := db.GetCollection("users")
 
-		user := models.New(usersCollection)
+		user := models.NewUser(usersCollection)
 
 		unmarshalError := json.Unmarshal(c.Body(), user)
 
