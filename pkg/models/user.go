@@ -8,6 +8,7 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/paemuri/brdoc"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -73,7 +74,29 @@ func (u *User) Insert() (bool, error) {
 	return true, nil
 }
 
-func New(collection *mongo.Collection) *User {
+func (u *User) FindOne(id string) (bool, error) {
+	objectID, parseIdError := primitive.ObjectIDFromHex(id)
+
+	if parseIdError != nil {
+		return false, parseIdError
+	}
+
+	filter := bson.M{
+		"_id": objectID,
+	}
+
+	result := u.collection.FindOne(context.Background(), filter)
+
+	decodeError := result.Decode(u)
+
+	if decodeError != nil {
+		return false, decodeError
+	}
+
+	return true, nil
+}
+
+func NewUser(collection *mongo.Collection) *User {
 	_, indexesError := collection.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
 		{
 			Keys:    bsonx.Doc{{Key: "cpf", Value: bsonx.Int32(1)}},
