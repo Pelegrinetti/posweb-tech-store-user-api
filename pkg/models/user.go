@@ -2,11 +2,7 @@ package models
 
 import (
 	"context"
-	"errors"
 
-	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/paemuri/brdoc"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -36,35 +32,7 @@ type User struct {
 	Addresses  []Address          `bson:"addresses" json:"addresses"`
 }
 
-func validateCpf(value interface{}) error {
-	cpf := value.(string)
-
-	if !brdoc.IsCPF(cpf) {
-		return errors.New("must be a valid cpf")
-	}
-
-	return nil
-}
-
-func (u *User) Validate() error {
-	return validation.ValidateStruct(u,
-		validation.Field(&u.Id, validation.Required),
-		validation.Field(&u.Name, validation.Required, validation.Length(3, 80)),
-		validation.Field(&u.Email, validation.Required, is.Email),
-		validation.Field(&u.Cellphone, validation.NilOrNotEmpty),
-		validation.Field(&u.Picture, validation.NilOrNotEmpty),
-		validation.Field(&u.Cpf, validation.NilOrNotEmpty, validation.By(validateCpf)),
-		validation.Field(&u.Addresses, validation.NilOrNotEmpty),
-	)
-}
-
 func (u *User) Insert() (bool, error) {
-	validationError := u.Validate()
-
-	if validationError != nil {
-		return false, validationError
-	}
-
 	_, insertError := u.collection.InsertOne(context.TODO(), u)
 
 	if insertError != nil {
@@ -74,15 +42,9 @@ func (u *User) Insert() (bool, error) {
 	return true, nil
 }
 
-func (u *User) FindOne(id string) (bool, error) {
-	objectID, parseIdError := primitive.ObjectIDFromHex(id)
-
-	if parseIdError != nil {
-		return false, parseIdError
-	}
-
+func (u *User) FindOne(email string) (bool, error) {
 	filter := bson.M{
-		"_id": objectID,
+		email: email,
 	}
 
 	result := u.collection.FindOne(context.Background(), filter)
