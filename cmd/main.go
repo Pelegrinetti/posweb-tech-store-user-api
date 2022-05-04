@@ -26,8 +26,9 @@ func main() {
 	ctn := container.New()
 
 	ctn.AddDatabase(db)
+	ctn.AddConfig(cfg)
 
-	srv := server.New(ctn, cfg.ServerConfig)
+	srv := server.New(ctn)
 
 	srv.Run()
 }

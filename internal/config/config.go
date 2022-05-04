@@ -1,20 +1,33 @@
 package config
 
 import (
-	"github.com/Pelegrinetti/posweb-user-api/pkg/database"
-	"github.com/Pelegrinetti/posweb-user-api/pkg/server"
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	ServerConfig   server.ServerConfig     `mapstructure:",squash"`
-	DatabaseConfig database.DatabaseConfig `mapstructure:",squash"`
+type ServerConfig struct {
+	Port int `mapstructure:"PORT"`
 }
 
-func New() Config {
+type DatabaseConfig struct {
+	Uri    string `mapstructure:"MONGODB_URI"`
+	DBName string `mapstructure:"MONGODB_NAME"`
+}
+
+type AuthConfig struct {
+	GoogleClientId string `mapstructure:"GOOGLE_CLIENT_ID"`
+}
+
+type Config struct {
+	ServerConfig   ServerConfig     `mapstructure:",squash"`
+	DatabaseConfig DatabaseConfig `mapstructure:",squash"`
+	AuthConfig     AuthConfig              `mapstructure:",squash"`
+}
+
+func New() *Config {
 	viper.SetDefault("PORT", 3001)
 	viper.SetDefault("MONGODB_URI", "mongodb://localhost:27017/user-api")
 	viper.SetDefault("MONGODB_NAME", "user-api")
+	viper.SetDefault("GOOGLE_CLIENT_ID", "")
 	viper.AutomaticEnv()
 
 	config := Config{}
@@ -25,5 +38,5 @@ func New() Config {
 		panic(err)
 	}
 
-	return config
+	return &config
 }

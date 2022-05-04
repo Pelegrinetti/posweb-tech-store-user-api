@@ -3,17 +3,14 @@ package server
 import (
 	"fmt"
 
+	"github.com/Pelegrinetti/posweb-user-api/internal/config"
 	"github.com/Pelegrinetti/posweb-user-api/pkg/container"
 	"github.com/Pelegrinetti/posweb-user-api/pkg/controllers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
-
-type ServerConfig struct {
-	Port int `mapstructure:"PORT"`
-}
 type server struct {
-	config    ServerConfig
+	config    config.ServerConfig
 	app       *fiber.App
 	container *container.Container
 }
@@ -38,7 +35,8 @@ func (s *server) setupRoutes() {
 		return c.Status(503).SendString("NOK")
 	})
 
-	s.app.Post("/users", controllers.CreateUser(s.container.Database))
+	s.app.Post("/users", controllers.HandleLogin(s.container))
+	s.app.Put("/users", controllers.UpdateUser(s.container))
 }
 
 func (s *server) Run() {
@@ -47,11 +45,11 @@ func (s *server) Run() {
 	s.app.Listen(fmt.Sprintf(":%d", s.config.Port))
 }
 
-func New(ctn *container.Container, serverConfig ServerConfig) *server {
+func New(ctn *container.Container) *server {
 	app := fiber.New()
 
 	return &server{
-		config:    serverConfig,
+		config:    ctn.Config.ServerConfig,
 		app:       app,
 		container: ctn,
 	}
