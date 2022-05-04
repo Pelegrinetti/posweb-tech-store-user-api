@@ -44,14 +44,16 @@ func (u *User) Insert() (bool, error) {
 
 func (u *User) FindOne(email string) (bool, error) {
 	filter := bson.M{
-		email: email,
+		"email": email,
 	}
 
-	result := u.collection.FindOne(context.Background(), filter)
+	result := u.collection.FindOne(context.TODO(), filter)
 
 	decodeError := result.Decode(u)
 
 	if decodeError != nil {
+		logrus.Error("Error decoding user on FindOne method: ", decodeError)
+
 		return false, decodeError
 	}
 
