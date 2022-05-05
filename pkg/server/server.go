@@ -35,7 +35,7 @@ func (s *server) setupRoutes() {
 		return c.Status(503).SendString("NOK")
 	})
 
-	s.app.Post("/users", controllers.HandleLogin(s.container))
+	s.app.Post("/handle-login", controllers.HandleLogin(s.container))
 	s.app.Put("/users", controllers.UpdateUser(s.container))
 }
 
