@@ -33,7 +33,11 @@ type User struct {
 }
 
 func (u *User) Insert() (bool, error) {
-	_, insertError := u.collection.InsertOne(context.TODO(), u)
+	filter := bson.M{"_id": u.Id}
+	update := bson.D{{ Key: "$set", Value: u }}
+	opts :=  options.Update().SetUpsert(true)
+
+	_, insertError := u.collection.UpdateOne(context.TODO(), filter, update, opts)
 
 	if insertError != nil {
 		return false, insertError
@@ -42,11 +46,7 @@ func (u *User) Insert() (bool, error) {
 	return true, nil
 }
 
-func (u *User) FindOne(email string) (bool, error) {
-	filter := bson.M{
-		"email": email,
-	}
-
+func (u *User) FindOne(filter bson.M) (bool, error) {
 	result := u.collection.FindOne(context.TODO(), filter)
 
 	decodeError := result.Decode(u)

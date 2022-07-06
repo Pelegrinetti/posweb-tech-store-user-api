@@ -36,7 +36,7 @@ func (s *server) setupRoutes() {
 	})
 
 	s.app.Post("/handle-login", controllers.HandleLogin(s.container))
-	s.app.Put("/users", controllers.UpdateUser(s.container))
+	s.app.Put("/users/:id", controllers.UpdateUser(s.container))
 }
 
 func (s *server) Run() {

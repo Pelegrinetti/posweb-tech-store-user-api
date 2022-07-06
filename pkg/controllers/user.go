@@ -7,6 +7,7 @@ import (
 	"github.com/Pelegrinetti/posweb-user-api/pkg/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -25,7 +26,9 @@ func HandleLogin(ctn *container.Container) fiber.Handler {
 			return c.SendStatus(500)
 		}
 
-		if found, _ := user.FindOne(user.Email); found {
+		if found, _ := user.FindOne(bson.M{
+			"email": user.Email,
+		}); found {
 			jsonOutput, jsonOutputError := json.Marshal(user)
 
 			if jsonOutputError != nil {
@@ -67,10 +70,35 @@ func UpdateUser(ctn *container.Container) fiber.Handler {
 
 		user := models.NewUser(usersCollection)
 
-		_, findError := user.FindOne(c.Params("id"))
+		objectId, err := primitive.ObjectIDFromHex(c.Params("id"))
+		if err != nil {
+			logrus.Error("Invalid ID: ", err)
+
+			return c.SendStatus(400)
+		}
+
+		_, findError := user.FindOne(bson.M{
+			"_id": objectId,
+		})
 
 		if findError != nil {
 			logrus.Error("Can't find user: ", findError)
+		}
+
+		unmarshalError := json.Unmarshal(c.Body(), &user)
+
+		if unmarshalError != nil {
+			logrus.Error(unmarshalError)
+
+			return c.SendStatus(500)
+		}
+
+		_, insertError := user.Insert()
+
+		if insertError != nil {
+			logrus.Error("Insert user error: ", insertError)
+
+			return c.SendStatus(500)
 		}
 
 		parsedUser, parsingError := json.Marshal(user)
